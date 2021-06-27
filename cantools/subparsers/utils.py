@@ -49,17 +49,10 @@ def _format_signals_dict(message, decoded_signals):
     return formatted_signals
 
 
-#def _format_message_single_line(message, formatted_signals):
-#    return ' {}:{{ {} }}'.format(message.name,
-#                            ', '.join(formatted_signals))
-
 def _format_message_single_line(message, formatted_signals):
-    return ' {}:({})'.format(message.name,
+    return ' {}({})'.format(message.name,
                             ', '.join(formatted_signals))
 
-
-#def format_message_json(message, formatted_signals):
-#    return (message.name, formatted_signals)
 
 def _format_message_multi_line(message, formatted_signals):
     indented_signals = [
