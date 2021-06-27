@@ -29,10 +29,37 @@ def _format_signals(message, decoded_signals):
     return formatted_signals
 
 
+def _format_signals_dict(message, decoded_signals):
+    formatted_signals = dict()
+
+    for signal in message.signals:
+        try:
+            value = decoded_signals[signal.name]
+        except KeyError:
+            continue
+
+        if isinstance(value, str):
+            value = "'{}'".format(value)
+
+        signal_name = "{}.{}".format(message.name, signal.name)
+        formatted_signals.update(
+            {signal_name:value}
+        )
+
+    return formatted_signals
+
+
+#def _format_message_single_line(message, formatted_signals):
+#    return ' {}:{{ {} }}'.format(message.name,
+#                            ', '.join(formatted_signals))
+
 def _format_message_single_line(message, formatted_signals):
-    return ' {}({})'.format(message.name,
+    return ' {}:({})'.format(message.name,
                             ', '.join(formatted_signals))
 
+
+#def format_message_json(message, formatted_signals):
+#    return (message.name, formatted_signals)
 
 def _format_message_multi_line(message, formatted_signals):
     indented_signals = [
@@ -55,6 +82,23 @@ def format_message_by_frame_id(dbase,
         return ' Unknown frame id {0} (0x{0:x})'.format(frame_id)
 
     return format_message(message, data, decode_choices, single_line)
+
+
+def message_to_dict(dbase, frame_id, data, decode_choices):
+
+    try:
+        message = dbase.get_message_by_frame_id(frame_id)
+    except KeyError:
+        return dict()
+
+    try:
+        decoded_signals = message.decode(data, decode_choices)
+    except Exception as e:
+        return dict()
+    signals_dict = _format_signals_dict(message, decoded_signals)
+
+    return signals_dict
+
 
 
 def format_message(message, data, decode_choices, single_line):
